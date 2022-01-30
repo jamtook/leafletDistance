@@ -1,4 +1,8 @@
-   var map = L.map('map', {
+//global variables
+var globalStartCoordArr = [];
+var globalEndCoordArr =[];
+
+var map = L.map('map', {
             center: [0, 0],
             zoom: 5
         });
@@ -48,12 +52,15 @@
             console.log(typeof lat1)
             latS = parseFloat(lat1);
             lonS = parseFloat(lng1);
+            window.globalStartCoordArr = [latS, lonS];
+            console.log("globalStartCoordArr: ", globalStartCoordArr);
             document.getElementById('latS').value = lat1;
             document.getElementById('lonS').value = lng1;
             myBlueMarker.bindPopup("Lat " + latS + "<br />Lon " + lonS).openPopup();
             updateBounds();  
              myBlueMarker.bindPopup("Lat " + latS + "<br />Lon " + lonS).openPopup();
-            window.globalStartArr = [latS, lngS];
+            return globalStartCoordArr;
+            
         }
 
         
@@ -63,7 +70,7 @@
             var xmlhttp = new XMLHttpRequest();
             var url = "https://nominatim.openstreetmap.org/search?format=json&limit=3&q=" + inp.value;
             xmlhttp.onreadystatechange = async function() {
-                if (this.status == 200) {
+                if (this.readyState === 4 && this.status == 200) {
                     var myArr = await JSON.parse(this.responseText);
                     console.log("myArr: ", myArr[0].lat)
                     var latitude = myArr[0].lat;
@@ -85,12 +92,14 @@
             console.log(typeof lat1)
             latE = parseFloat(lat1);
             lonE = parseFloat(lng1);
+            window.globalEndCoordArr = [latE, lonE];
+            console.log("globalEndCoordArr: ", globalEndCoordArr);
             document.getElementById('DestLat').value = lat1;
             document.getElementById('DestLon').value = lng1;
             myRedMarker.bindPopup(" DestLat " + latE + "<br />DestLon " + lonE).openPopup();
             updateBounds(); 
              myRedMarker.bindPopup(" DestLat " + latE + "<br />DestLon " + lonE).openPopup();
-            window.globalEndArr = [latE, lngE];
+           
         }
 
 //this gets the 1ST (only!!!) address back from OSM database & gets lat/long coordinates
@@ -99,7 +108,7 @@
             var xmlhttp = new XMLHttpRequest();
             var url = "https://nominatim.openstreetmap.org/search?format=json&limit=3&q=" + inp.value;
             xmlhttp.onreadystatechange = function() {
-                if (this.status == 200) {
+                if (this.readyState === 4 && this.status == 200) {
                     var myArr = JSON.parse(this.responseText);
                     console.log("myArr: ", myArr[0].lat)
                     var latitude = myArr[0].lat;
@@ -110,10 +119,42 @@
             };
             xmlhttp.open("GET", url, true);
             xmlhttp.send();
-        }
+        };
 //===============================================
 //this is to make both markers fit on the page
 function updateBounds(){
             var group = new L.featureGroup([myBlueMarker, myRedMarker]);
             map.fitBounds(group.getBounds().pad(0.5));
-        }
+             measureBetweenPoints()
+        };
+
+//this function searches both addresses at once
+function searchAddresses() {
+    startAddr_search();
+    endAddr_search();
+   ;
+};
+
+//this measures the distance between the two points
+function measureBetweenPoints() {
+    var globalStartCoordLat = globalStartCoordArr[0];
+    var globalStartCoordLon = globalStartCoordArr[1];
+    var globalEndCoordLat = globalEndCoordArr[0];
+    var globalEndCoordLon = globalEndCoordArr[1];
+    console.log("s", globalEndCoordArr[0]);
+
+    //get the distance between 2 points
+    var from = turf.point([globalStartCoordLat, globalStartCoordLon]);
+    var to = turf.point([globalEndCoordLat, globalEndCoordLon]);
+    var options = {units: 'miles'};
+    var distance = turf.distance(from, to, options);
+    console.log("distance: ", distance)
+    
+    //draw a line between 2 points
+    var latlngs = [ [globalStartCoordLat, globalStartCoordLon], [globalEndCoordLat, globalEndCoordLon] ];
+        var polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);
+
+    // zoom the map to the polyline
+    map.fitBounds(polyline.getBounds().pad(0.5));
+    
+};

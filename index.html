@@ -3,26 +3,31 @@
 <head>
     <title>Leaflet Address Lookup and Coordinates</title>
     <meta charset="utf-8">
+
+    
+    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
     <link rel="stylesheet" href="style/style.css">
     <style type="text/css"></style>
+    <script type="text/javascript" src="https://npmcdn.com/@turf/turf@3.5.1/turf.min.js"></script>
+    <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
+    
 </head>
 
 <body>
     <div class="container">
 
-        <b>Coordinates!!</b>
+        <b>Coordinates</b>
         <form>
-            <input type="text" name="lat" id="lat" size=12 value="">
-            <input type="text" name="lon" id="lon" size=12 value="">
+            <input type="text" name="latS" id="latS" size=12 value="">
+            <input type="text" name="lonS" id="lonS" size=12 value="">
         </form>
 
         <b>Start Address Lookup</b>
         <div id="search">
             <input type="text" name="addr" value="" id="startAddr" size="58" />
-            <button type="button" onclick="startAddr_search();">Search</button>
-            <div id="startResults"></div>
+            </br>
             </br>
         <b>Destination Address Lookup</b>
             <form>
@@ -31,7 +36,7 @@
             </form>
             <input type="text" name="addr" value="" id="endAddr" size="58" />
             <div id="endResults"></div>
-            <button type="button" onclick="endAddr_search();">Search</button>
+            <button type="button" onclick="searchAddresses();">Search</button>
             <div id="endResults"></div>
         </div>
 
